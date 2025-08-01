@@ -1,0 +1,223 @@
+[
+  {
+    "id": 1,
+    "question": "Что выведет следующий код?\n\n```js\nconsole.log(typeof null);\n```",
+    "variants": ["object", "null", "undefined", "NaN"],
+    "correct": "object"
+  },
+  {
+    "id": 2,
+    "question": "Что делает метод Array.push()?",
+    "variants": ["Удаляет последний элемент массива", "Добавляет элемент в начало массива", "Добавляет элемент в конец массива", "Сортирует массив по возрастанию"],
+    "correct": "Добавляет элемент в конец массива"
+  },
+  {
+    "id": 3,
+    "question": "Какой результат выполнения `2 + '2'`?",
+    "variants": ["4", "22", "NaN", "undefined"],
+    "correct": "22"
+  },
+  {
+    "id": 4,
+    "question": "Как создать функцию в JavaScript?",
+    "variants": ["function = myFunc() {}", "function myFunc() {}", "func myFunc() = {}", "create function myFunc()"],
+    "correct": "function myFunc() {}"
+  },
+  {
+    "id": 5,
+    "question": "Что такое NaN?",
+    "variants": ["Значение \"Not a Number\"", "Функция", "Переменная", "Объект"],
+    "correct": "Значение \"Not a Number\""
+  },
+  {
+    "id": 6,
+    "question": "Какое значение имеет переменная до присваивания?\n\n```js\nlet x;\nconsole.log(x);\n```",
+    "variants": ["null", "undefined", "NaN", "0"],
+    "correct": "undefined"
+  },
+  {
+    "id": 7,
+    "question": "Какой метод удаляет последний элемент массива?",
+    "variants": ["shift()", "push()", "pop()", "unshift()"],
+    "correct": "pop()"
+  },
+  {
+    "id": 8,
+    "question": "Какое ключевое слово используется для создания переменной, которую нельзя переопределить?",
+    "variants": ["var", "let", "const", "static"],
+    "correct": "const"
+  },
+  {
+    "id": 9,
+    "question": "Какой оператор используется для строгого сравнения?",
+    "variants": ["=", "==", "===", "!==="],
+    "correct": "==="
+  },
+  {
+    "id": 10,
+    "question": "Что такое DOM?",
+    "variants": ["Объектная модель документа", "Система баз данных", "API браузера", "Алгоритм рендеринга CSS"],
+    "correct": "Объектная модель документа"
+  },
+  {
+    "id": 11,
+    "question": "Что выведет этот код?\n\n```js\nlet a = 0;\nlet b = false;\nconsole.log(a == b);\nconsole.log(a === b);\n```",
+    "variants": ["true / false", "false / true", "true / true", "false / false"],
+    "correct": "true / false"
+  },
+  {
+    "id": 13,
+    "question": "Что делает метод map()?",
+    "variants": ["Изменяет исходный массив", "Возвращает новый массив", "Удаляет элементы", "Объединяет массивы"],
+    "correct": "Возвращает новый массив"
+  },
+  {
+    "id": 13,
+    "question": "Что произойдет при вызове функции до её объявления?\n\n```js\nsayHi();\nfunction sayHi() {\n  console.log(\"Hello!\");\n}\n```",
+    "variants": ["\"Hello!\"", "Ошибка", "undefined", "null"],
+    "correct": "\"Hello!\""
+  },
+  {
+    "id": 14,
+    "question": "Что делает this внутри метода объекта?",
+    "variants": [
+      "Ссылается на сам объект",
+      "Ссылается на глобальный объект",
+      "Всегда undefined",
+      "Зависит от вызова"
+    ],
+    "correct": "Ссылается на сам объект"
+  },
+  {
+    "id": 15,
+    "question": "Что делает оператор ?? (nullish coalescing)?",
+    "variants": [
+      "Проверяет на null и undefined",
+      "Возвращает правый операнд, если левый — null или undefined",
+      "То же, что ||",
+      "Проверяет тип переменной"
+    ],
+    "correct": "Возвращает правый операнд, если левый — null или undefined"
+  },
+  {
+    "id": 16,
+    "question": "Как работает hoisting?",
+    "variants": [
+      "Переменные и функции поднимаются вверх области видимости",
+      "Все переменные удаляются",
+      "Значения сохраняются между вызовами",
+      "Это механизм сборки мусора"
+    ],
+    "correct": "Переменные и функции поднимаются вверх области видимости"
+  },
+  {
+    "id": 17,
+    "question": "Какой результат?\n\n```js\nconsole.log([1, 2, 3] + [4, 5, 6]);\n```",
+    "variants": ["[1,2,3,4,5,6]", "\"1,2,34,5,6\"", "Ошибка", "NaN"],
+    "correct": "\"1,2,34,5,6\""
+  },
+  {
+    "id": 18,
+    "question": "Какая разница между let и var?",
+    "variants": [
+      "`let` имеет блочную область видимости",
+      "`let` создаёт глобальную переменную",
+      "`var` используется только в функциях",
+      "Нет разницы"
+    ],
+    "correct": "`let` имеет блочную область видимости"
+  },
+  {
+    "id": 19,
+    "question": "Что делает метод filter()?",
+    "variants": [
+      "Изменяет массив",
+      "Возвращает новый массив, отфильтрованный по условию",
+      "Возвращает булево",
+      "Удаляет элементы"
+    ],
+    "correct": "Возвращает новый массив, отфильтрованный по условию"
+  },
+  {
+    "id": 20,
+    "question": "Что выведет код?\n\n```js\nconst x = [1];\nconst y = [1];\nconsole.log(x == y);\n```",
+    "variants": ["true", "false", "undefined", "1"],
+    "correct": "false"
+  },
+   {
+    "id": 21,
+    "question": "Что выведет этот код?\n\n```js\nlet a = {};\nlet b = a;\na = null;\nconsole.log(b);\n```",
+    "variants": ["{}", "null", "undefined", "Ошибка"],
+    "correct": "{}"
+  },
+  {
+    "id": 22,
+    "question": "Что делает замыкание (closure)?",
+    "variants": [
+      "Сохраняет доступ к переменным внешней функции",
+      "Удаляет переменные",
+      "Очищает память",
+      "Создает асинхронность"
+    ],
+    "correct": "Сохраняет доступ к переменным внешней функции"
+  },
+  {
+    "id": 23,
+    "question": "Что выведет следующий код?\n\n```js\nconsole.log(typeof NaN);\n```",
+    "variants": ["\"number\"", "\"NaN\"", "\"undefined\"", "\"null\""],
+    "correct": "\"number\""
+  },
+  {
+    "id": 24,
+    "question": "Какой будет результат?\n\n```js\n(() => {\n  let x = 10;\n  return (() => x + 5)();\n})();\n```",
+    "variants": ["15", "undefined", "10", "NaN"],
+    "correct": "15"
+  },
+  {
+    "id": 25,
+    "question": "Какое ключевое слово позволяет остановить выполнение цикла?",
+    "variants": ["skip", "end", "break", "stop"],
+    "correct": "break"
+  },
+  {
+    "id": 26,
+    "question": "Что произойдет при этом вызове?\n\n```js\n[...\"hello\"]\n```",
+    "variants": [
+      "['h','e','l','l','o']",
+      "Ошибка",
+      "\"hello\"",
+      "undefined"
+    ],
+    "correct": "['h','e','l','l','o']"
+  },
+  {
+    "id": 27,
+    "question": "Что делает оператор Object.freeze(obj)?",
+    "variants": [
+      "Делает объект неизменяемым",
+      "Удаляет все свойства",
+      "Глубоко клонирует",
+      "Удаляет прототип"
+    ],
+    "correct": "Делает объект неизменяемым"
+  },
+  {
+    "id": 28,
+    "question": "Какой вывод даст?\n\n```js\nfunction foo() {\n  return;\n  {\n    bar: \"value\"\n  }\n}\nconsole.log(foo());\n```",
+    "variants": ["undefined", "{ bar: \"value\" }", "SyntaxError", "null"],
+    "correct": "undefined"
+  },
+  {
+    "id": 29,
+    "question": "Что вернёт Promise.resolve(5).then(console.log)?",
+    "variants": ["5", "Promise", "undefined", "Ошибка"],
+    "correct": "5"
+  },
+  {
+    "id": 30,
+    "question": "Какая структура данных лучше всего подходит для LRU-кэша?",
+    "variants": ["Массив", "Объект", "Map", "Set"],
+    "correct": "Map"
+  }
+
+]
