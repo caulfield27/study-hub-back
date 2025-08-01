@@ -1,2 +1,2 @@
 require("./app/app");
-// require("./app/db/initDb");
+require("./app/db/initDb");
