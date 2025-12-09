@@ -6,7 +6,7 @@ const authMiddleware = require("../middlewares/auth.middleware");
 const upload = multer();
 
 
-router.get("/", authMiddleware, controller.getBooks);
+router.get("/", controller.getBooks);
 router.post("/", upload.none(), controller.postBook);
 
 module.exports = router;

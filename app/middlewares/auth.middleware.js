@@ -4,7 +4,6 @@ const { JWT_SECRET } = require("../utils/getEnv");
 module.exports = async function authMiddleware(req, res, next) {
   const token = req.header("Authorization");
   if (!token) res.status(401).send({ message: "Пользователь не авторизован" });
-  console.log('token: ', token);
   
   try {
     jwt.verify(token.split(' ')[1], JWT_SECRET);
