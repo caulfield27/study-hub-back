@@ -6,7 +6,7 @@ module.exports = async function authMiddleware(req, res, next) {
   if (!token) res.status(401).send({ message: "Пользователь не авторизован" });
   
   try {
-    jwt.verify(token.split(' ')[1], JWT_SECRET);
+    jwt.verify(token.startsWith('Bearer') ? token.split(' ')[1] : token, JWT_SECRET);
     next();
   } catch (e) {
     console.error(e);
