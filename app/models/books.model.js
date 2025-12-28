@@ -1,13 +1,15 @@
 const pool = require("../db/database");
 
-async function selectBooks(pageSize, page, search) {
+async function selectBooks(pageSize, page, search, sort_by_rating = false) {
   const offset = (page - 1) * pageSize;
   const searchValue = `%${search}%`;
 
-  const searchFilter = search ? `WHERE name ILIKE $1 OR author ILIKE $2` : "";
+  const searchFilter = search ? 'WHERE name ILIKE $1 OR author ILIKE $2' : '';
+  const orderQuery = sort_by_rating ? 'ORDER BY rating_avg DESC' : '';
   const searchQuery = `
       SELECT * FROM books
       ${searchFilter}
+      ${orderQuery}
       LIMIT $${search ? 3 : 1}
       OFFSET $${search ? 4 : 2}
     `;

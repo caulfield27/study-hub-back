@@ -10,13 +10,14 @@ const path = require("path");
 module.exports = {
   getBooks: async (req, res) => {
     try {
-      const { search, page, pageSize } = req.query;
+      const { search, page, pageSize, sort_by_rating } = req.query;
       const parsedPage = parseInt(page) || 1;
       const parsedPageSize = parseInt(pageSize) || 15;
       const result = await selectBooks(
         parsedPageSize,
         parsedPage,
-        search || ""
+        search || "",
+        sort_by_rating
       );
       res.status(200).send(result);
     } catch (err) {
