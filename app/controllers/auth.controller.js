@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { createUser, findUser } = require("../models/auth.model");
-const {JWT_SECRET} = require('../utils/getEnv');
+const { JWT_SECRET } = require("../utils/getEnv");
 
 module.exports = {
   registrUser: async (req, res) => {
@@ -26,21 +26,42 @@ module.exports = {
     }
   },
   login: async (req, res) => {
-    const { username, password } = req.body;
     try {
+      const { username, password } = req.body;
       const user = await findUser(username);
 
       const isMatch = await bcrypt.compare(password, user.password);
-      if(!isMatch){
-        res.status(400).send({message: 'Неверный пароль'});
-      };
-
-      const token = jwt.sign({id: user.id}, JWT_SECRET, {expiresIn: '24h'});
-      res.status(200).send({ data: token, message: "Пользователь успешно вошел в систему" });
+      if (!isMatch) {
+        res.status(400).send({ message: "Неверный пароль" });
+      }
+      const token = jwt.sign(
+        { username, email: user.email, id: user.id },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      res
+        .status(200)
+        .send({ data: token, message: "Пользователь успешно вошел в систему" });
     } catch (err) {
       const status = err?.status ?? 500;
       const message = err?.message ?? "Ошибка сервера";
       res.status(status).send({ message });
+    }
+  },
+  getMe: async (req, res) => {
+    try {
+      const token = req.header("Authorization");
+      if (!token)
+        res.status(401).send({ message: "Пользователь не авторизован" });
+
+      const user = jwt.verify(
+        token.startsWith("Bearer") ? token.split(" ")[1] : token, JWT_SECRET
+      );
+      
+      res.status(200).send({ data: user });
+    } catch (e) {
+      console.error(e);
+      res.status(401).send({ message: "Пользователь не авторизован" });
     }
   },
 };
