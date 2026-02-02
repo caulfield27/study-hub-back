@@ -6,6 +6,7 @@ const path = require("path");
 const booksRouter = require("./routes/library.routes");
 const quizesRouter = require("./routes/quizes.routes");
 const authRouter = require("./routes/auth.routes");
+const globalRouter = require("./routes/global.routes");
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/books", booksRouter);
 app.use("/api/quizes", quizesRouter);
 app.use("/api", authRouter);
+app.use("/api/search", globalRouter);
+
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен на ${BASE_URL}`);
