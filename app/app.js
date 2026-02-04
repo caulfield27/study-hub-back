@@ -7,6 +7,7 @@ const booksRouter = require("./routes/library.routes");
 const quizesRouter = require("./routes/quizes.routes");
 const authRouter = require("./routes/auth.routes");
 const globalRouter = require("./routes/global.routes");
+const coursesRouter = require("./routes/courses.routes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/pdf", express.static(path.join(__dirname, "pdf")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/books", booksRouter);
 app.use("/api/quizes", quizesRouter);
+app.use("/api/courses", coursesRouter);
 app.use("/api", authRouter);
 app.use("/api/search", globalRouter);
 
