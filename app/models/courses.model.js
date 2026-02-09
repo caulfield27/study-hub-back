@@ -10,7 +10,7 @@ async function selectCourses() {
         description,
         language,
         duration,
-        isFree,
+        is_free,
         price,
         course_categories
         ) FROM courses`;
