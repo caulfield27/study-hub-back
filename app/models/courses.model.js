@@ -2,7 +2,7 @@ const pool = require("../db/database");
 
 async function selectCourses() {
   try {
-    const courseQuery = `
+    const query = `
         SELECT (
         id,
         poster,
@@ -13,18 +13,11 @@ async function selectCourses() {
         is_free,
         price
         ) FROM courses`;
-    const categoryQuery = `
-      SELECT co.id AS course_id, c.name AS category_name
-      FROM courses co
-      JOIN course_categories cc ON co.id = cc.course_id
-      JOIN categories c ON c.id = cc.category_id
-    `;
-    const courses = await pool.query(courseQuery);
-    const categories = await pool.query(categoryQuery);
-    return [...courses.rows, categories.row];
+    const result = await pool.query(query);
+    return result.rows;
   } catch (e) {
     throw e;
   }
 }
 
-module.exports = { selectCourses };
+module.exports = {selectCourses};
