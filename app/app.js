@@ -16,8 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 // app routes
-app.use("/pdf", express.static(path.join(__dirname, "pdf")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/pdf", express.static(path.join(__dirname, "pdf")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/books", booksRouter);
 app.use("/api/quizes", quizesRouter);
 app.use("/api/courses", coursesRouter);
