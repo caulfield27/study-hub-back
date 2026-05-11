@@ -42,7 +42,7 @@ async function selectBookById(id, page = 1, perPage = 5) {
   const reviews = await pool.query(
     `
     SELECT r.*, u.username 
-    FROM reviews r 
+    FROM book_reviews r 
     JOIN users u ON u.id = r.user_id 
     WHERE r.book_id = $1 
     ORDER BY r.created_at DESC 
@@ -65,7 +65,7 @@ async function insertReview(book_id, user_id, rating, comment) {
 
     const insertRes = await client.query(
       `
-      INSERT INTO reviews (book_id, user_id, rating, comment)
+      INSERT INTO book_reviews (book_id, user_id, rating, comment)
       VALUES ($1, $2, $3, $4)
       RETURNING id, created_at
     `,
@@ -80,7 +80,7 @@ async function insertReview(book_id, user_id, rating, comment) {
         SELECT 
           COUNT(*) AS total_reviews,
           COALESCE(AVG(rating), 0)::NUMERIC(2,1) AS avg_rating
-        FROM reviews 
+        FROM book_reviews 
         WHERE book_id = $1
       )
       UPDATE books
