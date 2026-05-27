@@ -1,6 +1,11 @@
-const pool = require("../db/database");
+import pool from "../db/database";
+import { QueryResult } from "pg";
+import { SearchResult } from "../types/globals";
+import { Book } from "../types/books";
+import { Course } from "../types/courses";
+import { QuizSummary } from "../types/quizes";
 
-async function getSearchResult(query) {
+export async function getSearchResult(query: string): Promise<SearchResult> {
   try {
     const booksQuery =
       "SELECT * FROM books WHERE name ILIKE $1 OR author ILIKE $1";
@@ -34,10 +39,14 @@ async function getSearchResult(query) {
         OR cat.name ILIKE $1
       GROUP BY c.id
       `;
-    const promises = [
-      pool.query(booksQuery, ["%" + query + "%"]),
-      pool.query(quizesQuery, ["%" + query + "%"]),
-      pool.query(coursesQuery, ["%" + query + "%"]),
+    const promises: [
+      Promise<QueryResult<Book>>,
+      Promise<QueryResult<QuizSummary>>,
+      Promise<QueryResult<Course>>
+    ] = [
+      pool.query<Book>(booksQuery, ["%" + query + "%"]),
+      pool.query<QuizSummary>(quizesQuery, ["%" + query + "%"]),
+      pool.query<Course>(coursesQuery, ["%" + query + "%"]),
     ];
     const [booksReult, quizesResult, coursesResult] =
       await Promise.all(promises);
@@ -50,5 +59,3 @@ async function getSearchResult(query) {
     throw e;
   }
 }
-
-module.exports = { getSearchResult };

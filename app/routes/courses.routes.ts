@@ -1,10 +1,11 @@
-const { Router } = require("express");
-const {
+import { Router } from "express";
+import {
   getCourses,
   getCoursesBySlug,
   getCategories,
   postReview,
-} = require("../controllers/courses.controller");
+} from "../controllers/courses.controller";
+
 const router = Router();
 
 router.get("/", getCourses);
@@ -12,4 +13,4 @@ router.get("/categories", getCategories);
 router.get("/:slug", getCoursesBySlug);
 router.post("/review/:id", postReview);
 
-module.exports = router;
+export default router;

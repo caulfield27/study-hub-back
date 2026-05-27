@@ -1,15 +1,16 @@
-const pool = require("../db/database");
+import pool from "../db/database";
+import { Category, Course, CourseWithReviews, CourseReview, CoursesQuery, NewReview } from "../types/courses";
 
-async function selectCourses(queries) {
+export async function selectCourses(queries: CoursesQuery): Promise<Course[]> {
   try {
     const { sort, category, price, rating, lang } = queries;
-    const values = [];
-    const conditions = [];
+    const values: (string | number | boolean)[] = [];
+    const conditions: string[] = [];
     let courseIdsSubquery = "";
 
     if (category) {
       const categories = category.split(",");
-      const placeholders = [];
+      const placeholders: string[] = [];
       categories.forEach((c, i) => {
         values.push(c);
         placeholders.push(`cat2.name = $${values.length}`);
@@ -98,14 +99,18 @@ async function selectCourses(queries) {
       ${orderQuery}
       `;
 
-    const result = await pool.query(query, values);
+    const result = await pool.query<Course>(query, values);
     return result.rows;
   } catch (e) {
     throw e;
   }
 }
 
-async function selectCourseBySlug(slug, page = 1, perPage = 5) {
+export async function selectCourseBySlug(
+  slug: string,
+  page: number = 1,
+  perPage: number = 5
+): Promise<CourseWithReviews> {
   try {
     const query = `
     SELECT
@@ -136,11 +141,10 @@ async function selectCourseBySlug(slug, page = 1, perPage = 5) {
         GROUP BY c.id
         `;
 
-    const result = await pool.query(query, [slug]);
-    const course_id = result.rows?.[0]?.id;
+    const result = await pool.query<Course>(query, [slug]);
+    const course_id: number | undefined = result.rows?.[0]?.id;
     if (!course_id) {
-      throw e;
-      return;
+      throw new Error("Курс не найден");
     }
 
     const offset = (page - 1) * perPage;
@@ -149,11 +153,11 @@ async function selectCourseBySlug(slug, page = 1, perPage = 5) {
         FROM course_reviews r
         JOIN users u ON u.id = r.user_id
         WHERE r.course_id = $1
-        ORDER BY r.created_at DESC 
+        ORDER BY r.created_at DESC
         LIMIT $2 OFFSET $3
         `;
 
-    const reviews = await pool.query(reviewsQuery, [
+    const reviews = await pool.query<CourseReview>(reviewsQuery, [
       course_id,
       perPage,
       offset,
@@ -164,29 +168,34 @@ async function selectCourseBySlug(slug, page = 1, perPage = 5) {
   }
 }
 
-async function selectCategories() {
+export async function selectCategories(): Promise<Category[]> {
   try {
     const query = "SELECT * FROM categories";
-    const result = await pool.query(query);
+    const result = await pool.query<Category>(query);
     return result.rows;
   } catch (e) {
     throw e;
   }
 }
 
-async function insertCourseReview(course_id, user_id, rating, comment) {
+export async function insertCourseReview(
+  course_id: number,
+  user_id: number,
+  rating: number,
+  comment: string | null
+): Promise<NewReview> {
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
 
-    const insertRes = await client.query(
+    const insertRes = await client.query<NewReview>(
       `
       INSERT INTO course_reviews (course_id, user_id, rating, comment)
       VALUES ($1, $2, $3, $4)
       RETURNING id, created_at
     `,
-      [course_id, user_id, rating, comment],
+      [course_id, user_id, rating, comment]
     );
 
     const newReview = insertRes.rows[0];
@@ -194,20 +203,20 @@ async function insertCourseReview(course_id, user_id, rating, comment) {
     await client.query(
       `
       WITH stats AS (
-        SELECT 
+        SELECT
           COUNT(*) AS total_reviews,
           COALESCE(AVG(rating), 0)::NUMERIC(2,1) AS avg_rating
-        FROM course_reviews 
+        FROM course_reviews
         WHERE course_id = $1
       )
       UPDATE courses
-      SET 
+      SET
         reviews_count = stats.total_reviews,
         rating_avg = stats.avg_rating
       FROM stats
       WHERE courses.id = $1
     `,
-      [course_id],
+      [course_id]
     );
 
     await client.query("COMMIT");
@@ -221,10 +230,3 @@ async function insertCourseReview(course_id, user_id, rating, comment) {
     client.release();
   }
 }
-
-module.exports = {
-  selectCourses,
-  selectCourseBySlug,
-  selectCategories,
-  insertCourseReview,
-};
