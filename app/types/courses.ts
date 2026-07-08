@@ -54,3 +54,23 @@ export interface NewReview {
   id: number;
   created_at: Date;
 }
+
+export interface CourseLesson {
+  name: string;
+  duration: string;
+  path: string;
+}
+
+export interface CoursePayload {
+  slug: string;
+  poster: string;
+  name: string;
+  author: string;
+  description: string;
+  language: string;
+  duration: string;
+  is_free: boolean;
+  price: number | null;
+  categoryIds: number[];
+  lessons: CourseLesson[];
+}

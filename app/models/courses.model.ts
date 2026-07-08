@@ -1,5 +1,13 @@
 import pool from "../db/database";
-import { Category, Course, CourseWithReviews, CourseReview, CoursesQuery, NewReview } from "../types/courses";
+import {
+  Category,
+  Course,
+  CourseWithReviews,
+  CourseReview,
+  CoursesQuery,
+  CoursePayload,
+  NewReview,
+} from "../types/courses";
 
 export async function selectCourses(queries: CoursesQuery): Promise<Course[]> {
   try {
@@ -109,7 +117,7 @@ export async function selectCourses(queries: CoursesQuery): Promise<Course[]> {
 export async function selectCourseBySlug(
   slug: string,
   page: number = 1,
-  perPage: number = 5
+  perPage: number = 5,
 ): Promise<CourseWithReviews> {
   try {
     const query = `
@@ -178,11 +186,130 @@ export async function selectCategories(): Promise<Category[]> {
   }
 }
 
+export async function insertCategory(name: string) {
+  const query = "INSERT INTO categories (name) VALUES ($1) RETURNING *";
+  await pool.query(query, [name]);
+}
+
+export async function insertCourse(data: CoursePayload): Promise<Course> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query<Course>(
+      `INSERT INTO courses (slug, poster, name, author, description, language, duration, is_free, price, lessons)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING *`,
+      [
+        data.slug, data.poster, data.name, data.author, data.description,
+        data.language, data.duration, data.is_free, data.price,
+        JSON.stringify(data.lessons ?? []),
+      ],
+    );
+
+    const course = result.rows[0];
+
+    for (const categoryId of data.categoryIds ?? []) {
+      await client.query(
+        "INSERT INTO course_categories (course_id, category_id) VALUES ($1, $2)",
+        [course.id, categoryId],
+      );
+    }
+
+    await client.query("COMMIT");
+    return course;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    if ((err as { code?: string }).code === "23505") {
+      throw new Error("SLUG_CONFLICT");
+    }
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function updateCourse(slug: string, data: CoursePayload): Promise<Course> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query<Course>(
+      `UPDATE courses
+       SET slug = $1, poster = $2, name = $3, author = $4, description = $5,
+           language = $6, duration = $7, is_free = $8, price = $9, lessons = $10
+       WHERE slug = $11
+       RETURNING *`,
+      [
+        data.slug, data.poster, data.name, data.author, data.description,
+        data.language, data.duration, data.is_free, data.price,
+        JSON.stringify(data.lessons ?? []), slug,
+      ],
+    );
+
+    if (!result.rows[0]) {
+      throw new Error("NOT_FOUND");
+    }
+
+    const course = result.rows[0];
+
+    await client.query("DELETE FROM course_categories WHERE course_id = $1", [course.id]);
+
+    for (const categoryId of data.categoryIds ?? []) {
+      await client.query(
+        "INSERT INTO course_categories (course_id, category_id) VALUES ($1, $2)",
+        [course.id, categoryId],
+      );
+    }
+
+    await client.query("COMMIT");
+    return course;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    if ((err as { code?: string }).code === "23505") {
+      throw new Error("SLUG_CONFLICT");
+    }
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function deleteCourse(slug: string): Promise<boolean> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const courseRes = await client.query<{ id: number }>(
+      "SELECT id FROM courses WHERE slug = $1",
+      [slug],
+    );
+
+    if (!courseRes.rows[0]) {
+      await client.query("ROLLBACK");
+      return false;
+    }
+
+    const courseId = courseRes.rows[0].id;
+
+    await client.query("DELETE FROM course_categories WHERE course_id = $1", [courseId]);
+    await client.query("DELETE FROM courses WHERE id = $1", [courseId]);
+
+    await client.query("COMMIT");
+    return true;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export async function insertCourseReview(
   course_id: number,
   user_id: number,
   rating: number,
-  comment: string | null
+  comment: string | null,
 ): Promise<NewReview> {
   const client = await pool.connect();
 
@@ -195,7 +322,7 @@ export async function insertCourseReview(
       VALUES ($1, $2, $3, $4)
       RETURNING id, created_at
     `,
-      [course_id, user_id, rating, comment]
+      [course_id, user_id, rating, comment],
     );
 
     const newReview = insertRes.rows[0];
@@ -216,7 +343,7 @@ export async function insertCourseReview(
       FROM stats
       WHERE courses.id = $1
     `,
-      [course_id]
+      [course_id],
     );
 
     await client.query("COMMIT");
