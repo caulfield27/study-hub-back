@@ -4,13 +4,12 @@ export interface User {
   email: string;
   password: string;
   role: string;
+  avatar: string | null
   created_at: Date;
   updated_at: Date;
 }
 
 export interface JwtPayload {
-  username: string;
-  email: string;
   id: number;
   role: string;
   iat?: number;
