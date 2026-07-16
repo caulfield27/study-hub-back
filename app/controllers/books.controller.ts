@@ -74,13 +74,19 @@ export const postSuggestion = async (
     const pdf = files["pdf"]?.[0];
 
     try {
-      await uploadBuffer(
+      const upload = await uploadBuffer(
         "books",
         "suggestion-poster/",
         image?.originalname,
         image?.buffer,
         image?.mimetype,
       );
+      await upload.done();
+      req.on("close", () => {
+        if (!req.complete) {
+          upload.abort();
+        }
+      });
     } catch (e) {
       console.error(e);
       res.status(500).send({ message: "Ошибка обработки постера" });
@@ -88,13 +94,19 @@ export const postSuggestion = async (
     }
 
     try {
-      await uploadBuffer(
+      const upload = await uploadBuffer(
         "books",
         "suggestion-pdf/",
         pdf?.originalname,
         pdf?.buffer,
         pdf?.mimetype,
       );
+      await upload.done();
+      req.on("close", () => {
+        if (!req.complete) {
+          upload.abort();
+        }
+      });
     } catch (e) {
       console.error(e);
       res.status(500).send({ message: "Ошибка обработки pdf" });
@@ -262,13 +274,19 @@ export const updateBook = async (
       try {
         deleteOldImage(id as string);
         const image = files["image"]?.[0];
-        await uploadBuffer(
+        const upload = await uploadBuffer(
           "books",
           "uploads/",
           image.originalname,
           image.buffer,
           image.mimetype,
         );
+        await upload.done();
+        req.on("close", () => {
+          if (!req.complete) {
+            upload.abort();
+          }
+        });
         dataToUpdate["image"] = `/uploads/${image.originalname}`;
       } catch (e) {
         console.error(e);
@@ -281,13 +299,19 @@ export const updateBook = async (
       try {
         deleteOldPdf(id as string);
         const pdf = files["pdf"]?.[0];
-        await uploadBuffer(
+        const upload = await uploadBuffer(
           "books",
           "pdf/",
           pdf.originalname,
           pdf.buffer,
           pdf.mimetype,
         );
+        await upload.done();
+        req.on("close", () => {
+          if (!req.complete) {
+            upload.abort();
+          }
+        });
         dataToUpdate["pdf"] = `/pdf/${pdf.originalname}`;
       } catch (e) {
         console.error(e);
@@ -328,13 +352,19 @@ export const postBook = async (req: Request, res: Response): Promise<void> => {
     const pdf = files["pdf"]?.[0];
 
     try {
-      await uploadBuffer(
+      const upload = await uploadBuffer(
         "books",
         "uploads/",
         image?.originalname,
         image?.buffer,
         image?.mimetype,
       );
+      await upload.done();
+      req.on("close", () => {
+        if (!req.complete) {
+          upload.abort();
+        }
+      });
     } catch (e) {
       console.error(e);
       res.status(500).send({ message: "Ошибка обработки постера" });
@@ -342,13 +372,19 @@ export const postBook = async (req: Request, res: Response): Promise<void> => {
     }
 
     try {
-      await uploadBuffer(
+      const upload = await uploadBuffer(
         "books",
         "pdf/",
         pdf?.originalname,
         pdf?.buffer,
         pdf?.mimetype,
       );
+      await upload.done();
+      req.on("close", () => {
+        if (!req.complete) {
+          upload.abort();
+        }
+      });
     } catch (e) {
       console.error(e);
       res.status(500).send({ message: "Ошибка обработки pdf" });

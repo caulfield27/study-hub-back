@@ -69,8 +69,6 @@ export async function findPasswordById(id: string): Promise<string> {
       error.status = 404;
       throw error;
     } else {
-      console.log('p: ', result.rows);
-      
       return result.rows[0]?.password ?? "";
     }
   } catch (e) {

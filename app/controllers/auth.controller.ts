@@ -110,14 +110,22 @@ export const updateMe = async (req: Request, res: Response): Promise<void> => {
         console.error(e);
       }
 
-      const result = await uploadBuffer(
+      const upload = await uploadBuffer(
         "books",
         "avatar/",
         avatarFile.originalname,
         avatarFile.buffer,
         avatarFile.mimetype,
       );
+
+      const result = await upload.done();
       avatarPath = "/" + (result.Key ?? "");
+
+      req.on("close", () => {
+        if (!req.complete) {
+          upload.abort();
+        }
+      });
     }
 
     const result = await updateUser(
@@ -147,7 +155,7 @@ export const handleChangePassport = async (req: Request, res: Response) => {
     const { currentPassword, newPassword } = req.body;
     const realPasswordHash = await findPasswordById(String(id));
 
-    const isMatch = await bcrypt.compare(currentPassword, realPasswordHash);    
+    const isMatch = await bcrypt.compare(currentPassword, realPasswordHash);
 
     if (!isMatch) {
       res.status(400).send({ message: "Неверно введен текущий пароль" });

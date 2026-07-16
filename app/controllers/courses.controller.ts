@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { raw, Request, Response } from "express";
 import {
   selectCourses,
   selectCategories,
@@ -16,7 +16,6 @@ import {
 } from "../types/courses";
 import { uploadBuffer } from "../aws/aws-upload";
 import { getCourseDuration, getVideoDuration } from "../utils/getVideoDuration";
-
 
 const uploadProgressHash = new Map<
   string,
@@ -128,12 +127,20 @@ export const uploadFile = async (
     const file = files[0];
     const folder = `${name}/`;
     const fileName = file.originalname;
+
     uploadProgressHash.set(id, {
       folder,
       filename: fileName,
       buffer: file.buffer,
       mimetype: file.mimetype,
     });
+
+    req.on("close", () => {
+      if (!req.complete) {
+        uploadProgressHash.delete(id);
+      }
+    });
+
     res.status(200).send({ message: "Файл успешно получен" });
   } catch (e) {
     console.error(e);
@@ -166,23 +173,33 @@ export const getProgress = async (
     res.setHeader("X-Accel-Buffering", "no");
     res.flushHeaders();
 
-    const result = await uploadBuffer(
+    const upload = await uploadBuffer(
       "video-courses",
       metadata.folder,
       metadata.filename,
       metadata.buffer,
       metadata.mimetype,
-      ({ loaded, total }) => {
-        if (loaded !== undefined && total !== undefined && total > 0) {
-          send("progress", String((loaded / total) * 100));
-        }
-      },
     );
 
+    upload.on("httpUploadProgress", ({ loaded, total }) => {
+      if (loaded !== undefined && total !== undefined && total > 0) {
+        send("progress", String((loaded / total) * 100));
+      }
+    });
+
+    const result = await upload.done();
     const duration = await getVideoDuration(metadata.buffer);
+
     send("done", {
-      path: '/'+result.Key,
+      path: "/" + result.Key,
       duration,
+    });
+
+    req.on("close", () => {
+      if (!req.complete) {
+        upload.abort();
+        uploadProgressHash.delete(id);
+      }
     });
   } catch (e) {
     console.error(e);
@@ -230,13 +247,19 @@ export const createCourse = async (
 
     let posterPath: string;
     try {
-      await uploadBuffer(
+      const upload = await uploadBuffer(
         "books",
         "course-posters/",
         posterFile.originalname,
         posterFile.buffer,
         posterFile.mimetype,
       );
+      await upload.done();
+      req.on("close", () => {
+        if (!req.complete) {
+          upload.abort();
+        }
+      });
       posterPath = `/course-posters/${posterFile.originalname}`;
     } catch (e) {
       console.error(e);
@@ -273,13 +296,19 @@ export const updateCourse = async (
     let posterPath: string | undefined;
     if (posterFile) {
       try {
-        await uploadBuffer(
+        const upload = await uploadBuffer(
           "books",
           "course-posters/",
           posterFile.originalname,
           posterFile.buffer,
           posterFile.mimetype,
         );
+        await upload.done();
+        req.on("close", () => {
+          if (!req.complete) {
+            upload.abort();
+          }
+        });
         posterPath = `/course-posters/${posterFile.originalname}`;
       } catch (e) {
         console.error(e);

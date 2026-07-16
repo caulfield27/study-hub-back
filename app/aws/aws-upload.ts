@@ -1,6 +1,6 @@
 import { Upload } from "@aws-sdk/lib-storage";
 import { r2 } from "../aws";
-import { CompleteMultipartUploadCommandOutput, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 
 export async function uploadBuffer(
@@ -9,12 +9,7 @@ export async function uploadBuffer(
   fileName: string,
   buffer: Buffer,
   contentType: string,
-  onProgress?: (progress: {
-    loaded?: number;
-    total?: number;
-    part?: number;
-  }) => void,
-): Promise<CompleteMultipartUploadCommandOutput> {
+) : Promise<Upload> {
   try {
     const upload = new Upload({
       client: r2,
@@ -25,12 +20,7 @@ export async function uploadBuffer(
         ContentType: contentType,
       },
     });
-
-    if (onProgress) {
-      upload.on("httpUploadProgress", onProgress);
-    }
-
-    return await upload.done();
+    return upload;
   } catch (e) {
     throw e;
   }
